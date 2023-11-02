@@ -2,6 +2,7 @@ package com.hzh.domain.node.file;
 
 import com.hzh.domain.node.NodeId;
 import com.hzh.domain.node.NodeStore;
+import com.hzh.exception.NodeStoreException;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,5 +1,7 @@
 package com.hzh.domain.log.task;
 
+import com.hzh.domain.timer.sepecific.NullScheduledFuture;
+
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -12,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  **/
 public class LogReplicationTask {
     private final ScheduledFuture<?> scheduledFuture;
+    public static final LogReplicationTask NONE = new LogReplicationTask(new NullScheduledFuture());
 
     //construct
 

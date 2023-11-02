@@ -1,5 +1,6 @@
 package com.hzh.rpc;
 
+import com.hzh.domain.message.AppendEntriesResult;
 import com.hzh.domain.message.AppendEntriesRpc;
 import com.hzh.domain.message.RequestVoteResult;
 import com.hzh.domain.message.RequestVoteRpc;
@@ -29,7 +30,7 @@ public interface Connector {
     void sendAppendEntries(AppendEntriesRpc rpc, NodeEndpoint destinationEndpoint);
 
     //Return Append dEnt es results to a single node
-    void replyAppendEntries(AppendEntriesRpc rpc, NodeEndpoint destinationEndpoint);
+    void replyAppendEntries(AppendEntriesResult rpc, NodeEndpoint destinationEndpoint);
 
     void close();
 }

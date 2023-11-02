@@ -1,5 +1,6 @@
 package com.hzh.domain.role.specific;
 
+import com.hzh.domain.node.NodeId;
 import com.hzh.domain.role.AbstractNodeRole;
 import com.hzh.domain.role.enums.RoleName;
 import com.hzh.domain.log.task.LogReplicationTask;
@@ -26,6 +27,11 @@ public class LeaderNodeRole extends AbstractNodeRole {
     @Override
     public void cancelTimeoutOrTask() {
         logReplicationTask.cancel();
+    }
+
+    @Override
+    public NodeId getLeaderId(NodeId selfId) {
+        return selfId;
     }
 
     @Override

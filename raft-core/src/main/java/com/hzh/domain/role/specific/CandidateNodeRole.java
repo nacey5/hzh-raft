@@ -1,5 +1,6 @@
 package com.hzh.domain.role.specific;
 
+import com.hzh.domain.node.NodeId;
 import com.hzh.domain.timer.ElectionTimeout;
 import com.hzh.domain.role.AbstractNodeRole;
 import com.hzh.domain.role.enums.RoleName;
@@ -35,6 +36,11 @@ public class CandidateNodeRole extends AbstractNodeRole {
     @Override
     public void cancelTimeoutOrTask() {
         electionTimeout.cancel();
+    }
+
+    @Override
+    public NodeId getLeaderId(NodeId selfId) {
+        return null;
     }
 
     public CandidateNodeRole increaseVotesCount(ElectionTimeout electionTimeout){

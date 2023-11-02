@@ -13,8 +13,15 @@ import lombok.Data;
 public class AppendEntriesResult {
     private final int term;
     private final boolean success;
+    private final String rpcMessageId;
 
     public AppendEntriesResult(int term, boolean success) {
+        this.term = term;
+        this.success = success;
+        rpcMessageId="";
+    }
+    public AppendEntriesResult(String rpcMessageId, int term, boolean success) {
+        this.rpcMessageId = rpcMessageId;
         this.term = term;
         this.success = success;
     }

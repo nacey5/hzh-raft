@@ -1,5 +1,7 @@
 package com.hzh.domain.timer;
 
+import com.hzh.domain.timer.sepecific.NullScheduledFuture;
+
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -12,8 +14,8 @@ import java.util.concurrent.TimeUnit;
  **/
 public class ElectionTimeout {
     private final ScheduledFuture<?> scheduledFuture;
+    public static final ElectionTimeout NONE = new ElectionTimeout(new NullScheduledFuture());
     //construct
-
     public ElectionTimeout(ScheduledFuture<?> scheduledFuture) {
         this.scheduledFuture = scheduledFuture;
     }

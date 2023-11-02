@@ -1,9 +1,7 @@
 package com.hzh.context;
 
 import com.google.common.eventbus.EventBus;
-import com.hzh.domain.node.NodeGroup;
-import com.hzh.domain.node.NodeId;
-import com.hzh.domain.node.NodeStore;
+import com.hzh.domain.node.*;
 import com.hzh.domain.timer.Scheduler;
 import com.hzh.exctutor.TaskExecutor;
 import com.hzh.rpc.Connector;
@@ -34,4 +32,13 @@ public class NodeContext {
     private TaskExecutor taskExecutor;
     //Partial role status data storage
     private NodeStore store;
+
+
+    public GroupMember findMember(NodeId nodeId){
+        GroupMember member = group.getMember(nodeId);
+        if (member == null) {
+            throw new IllegalArgumentException("no such node " + nodeId);
+        }
+        return member;
+    }
 }

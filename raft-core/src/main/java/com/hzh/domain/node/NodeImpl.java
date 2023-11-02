@@ -3,16 +3,14 @@ package com.hzh.domain.node;
 import com.google.common.eventbus.Subscribe;
 import com.hzh.context.NodeContext;
 import com.hzh.domain.log.task.LogReplicationTask;
-import com.hzh.domain.message.AppendEntriesResult;
-import com.hzh.domain.message.AppendEntriesRpc;
-import com.hzh.domain.message.RequestVoteResult;
-import com.hzh.domain.message.RequestVoteRpc;
+import com.hzh.domain.message.*;
 import com.hzh.domain.role.AbstractNodeRole;
 import com.hzh.domain.role.enums.RoleName;
 import com.hzh.domain.role.specific.CandidateNodeRole;
 import com.hzh.domain.role.specific.FollowerNodeRole;
 import com.hzh.domain.role.specific.LeaderNodeRole;
 import com.hzh.domain.timer.ElectionTimeout;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +27,8 @@ import java.util.Objects;
  * @Date 2023/11/1 19:33
  * @Version 0.0.1
  **/
+
+@Data
 public class NodeImpl implements Node {
 
     public static final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
@@ -74,7 +74,7 @@ public class NodeImpl implements Node {
     }
 
     //election Timeout
-    private void electionTimeout() {
+    public void electionTimeout() {
         context.getTaskExecutor().submit(this::doProcessElectionTimeout);
     }
 
@@ -120,7 +120,7 @@ public class NodeImpl implements Node {
         context.getTaskExecutor().submit(
                 () -> context.getConnector().replyRequestVote(
                         doProcessRequestVoteRpc(rpcMessage),
-                        context.findMember(rpcMessage.getSourceId().getEndpoint())
+                        context.findMember(rpcMessage.getSourceId()).getEndpoint()
                 )
         );
     }
@@ -216,7 +216,7 @@ public class NodeImpl implements Node {
         return context.getScheduler().scheduleLogReplicationTask(this::replicateLog);
     }
 
-    private void replicateLog() {
+    public void replicateLog() {
         context.getTaskExecutor().submit(this::doReplicateLog);
     }
 
@@ -224,11 +224,11 @@ public class NodeImpl implements Node {
         logger.debug("replicate log");
         //Send AppendEntries message to log replication target node
         for (GroupMember member : context.getGroup().listReplicationTargets()) {
-            doReplicateLog(member);
+            doReplicateLogForDetail(member);
         }
     }
 
-    private void doReplicateLog(GroupMember member) {
+    private void doReplicateLogForDetail(GroupMember member) {
         AppendEntriesRpc rpc = new AppendEntriesRpc();
         rpc.setTerm(role.getTerm());
         rpc.setLeaderId(context.getSelfId());
@@ -240,12 +240,12 @@ public class NodeImpl implements Node {
 
 
     @Subscribe
-    private void onReceiveAppendEntriesRpc(AppendEntriesRpcMessage rpcMessage) {
+    public void onReceiveAppendEntriesRpc(AppendEntriesRpcMessage rpcMessage) {
         context.getTaskExecutor().submit(() ->
                 context.getConnector().replyAppendEntries(
                         doProcessAppendEntriesRpc(rpcMessage),
                         //the node for the send message
-                        context.findMember(rpcMessage.getSourceNodeId()).getEndpoint()
+                        context.findMember(rpcMessage.getSourceId()).getEndpoint()
                 ));
     }
 
@@ -271,7 +271,7 @@ public class NodeImpl implements Node {
             case CANDIDATE:
                 ///If there are two Candidate roles and the other Candidate becomes the Leader first,
                 // the current node will degenerate into the Follower role and set the election timer.
-                becomeFollower(rpc.getTerm(), null, , rpc.getLeaderId(), this);
+                becomeFollower(rpc.getTerm(), null, rpc.getLeaderId(), true);
                 //append Log
                 return new AppendEntriesResult(rpc.getTerm(), appendEntries(rpc));
             case LEADER:
@@ -302,7 +302,7 @@ public class NodeImpl implements Node {
         }
         //check own role
         if (role.getName() !=RoleName.LEADER){
-            logger.warn (" receive append entries result from node {} but current node is not leader, ignore" , resu1tMessage.getSourceNodeld());
+            logger.warn (" receive append entries result from node {} but current node is not leader, ignore" , resultMessage.getSourceNodeId());
         }
 
     }

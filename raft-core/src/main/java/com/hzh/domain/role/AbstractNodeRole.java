@@ -1,5 +1,6 @@
 package com.hzh.domain.role;
 
+import com.hzh.domain.node.NodeId;
 import com.hzh.domain.role.enums.RoleName;
 import lombok.Data;
 
@@ -21,4 +22,8 @@ public abstract class AbstractNodeRole {
     }
 
     public abstract void cancelTimeoutOrTask();
+
+    public abstract NodeId getLeaderId(NodeId selfId);
+
+
 }
