@@ -31,4 +31,5 @@ public class GroupMember {
     boolean idEquals(NodeId id) {
         return endpoint.getId().equals(id);
     }
+
 }

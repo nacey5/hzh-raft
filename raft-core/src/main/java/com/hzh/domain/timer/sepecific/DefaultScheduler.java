@@ -1,5 +1,6 @@
 package com.hzh.domain.timer.sepecific;
 
+import com.hzh.config.NodeConfig;
 import com.hzh.domain.log.task.LogReplicationTask;
 import com.hzh.domain.timer.ElectionTimeout;
 import com.hzh.domain.timer.Scheduler;
@@ -48,12 +49,17 @@ public class DefaultScheduler implements Scheduler {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "election-timeout-scheduler"));
     }
 
-    /**
+    public DefaultScheduler(NodeConfig config){
+        this(config.getMinElectionTimeout(), config.getMaxElectionTimeout(), config.getLogReplicationDelay(),
+                config.getLogReplicationInterval());
+    }
+
+                            /**
      * Create a log replication schedule
      * @param task
      * @return
      */
-    @Override
+                            @Override
     public LogReplicationTask scheduleLogReplicationTask(Runnable task) {
         ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
                 task, logReplicationDelay, logReplicationInterval, TimeUnit.MILLISECONDS

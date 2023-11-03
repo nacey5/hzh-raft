@@ -1,6 +1,8 @@
 package com.hzh.domain.node;
 
+import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import com.hzh.config.NodeConfig;
 import com.hzh.context.NodeContext;
 import com.hzh.domain.node.memory.MemoryNodeStore;
 import com.hzh.domain.timer.Scheduler;
@@ -9,9 +11,9 @@ import com.hzh.exctutor.TaskExecutor;
 import com.hzh.exctutor.sepecific.SingleThreadTaskExecutor;
 import com.hzh.rpc.Connector;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 /**
  * @ClassName NodeBuilder
@@ -30,6 +32,11 @@ public class NodeBuilder {
     private TaskExecutor taskExecutor=null;
 
     private NodeStore store = null;
+
+    /**
+     * Node configuration.
+     */
+    private NodeConfig config = new NodeConfig();
 
     //single node build
     public NodeBuilder(NodeEndpoint endpoint){
@@ -57,6 +64,12 @@ public class NodeBuilder {
         return this;
     }
 
+    public NodeBuilder setConfig(@Nonnull NodeConfig config) {
+        Preconditions.checkNotNull(config);
+        this.config = config;
+        return this;
+    }
+
     public Node build(){
         return new NodeImpl(buildContext());
     }
@@ -66,8 +79,9 @@ public class NodeBuilder {
         context.setGroup(group);
         context.setSelfId(selfId);
         context.setEventBus(eventBus);
+        context.setConfig(config);
         //todo replace to the nodeConfig
-        context.setScheduler(scheduler!=null?scheduler:new DefaultScheduler(3000,4000,0,1000));
+        context.setScheduler(scheduler!=null?scheduler:new DefaultScheduler(config));
         context.setConnector(connector);
         context.setStore(store != null ? store : new MemoryNodeStore());
         context.setTaskExecutor(taskExecutor!=null?taskExecutor:new SingleThreadTaskExecutor("node"));

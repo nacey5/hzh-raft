@@ -50,6 +50,7 @@ public class NodeImpl implements Node {
         }
         //register to the eventBus
         context.getEventBus().register(this);
+        logger.info("the node {} has subscriber the event bus",context.getSelfId());
         //init the connector
         context.getConnector().initialize();
         //when it start started,the role is Follower
@@ -89,7 +90,6 @@ public class NodeImpl implements Node {
         //term+1
         int newTerm = role.getTerm() + 1;
         role.cancelTimeoutOrTask();
-        ;
         logger.info("start election");
         //become to the Candidate
         changeToRole(new CandidateNodeRole(newTerm, scheduleElectionTimeout()));
