@@ -7,5 +7,5 @@ package com.hzh.domain.log;
  * @Date 2023/11/1 16:24
  * @Version 0.0.1
  **/
-public class Entry {
+public interface Entry {
 }

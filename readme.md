@@ -315,4 +315,45 @@ junit
 
 </project>
 ```
+任期迁移模型：
+
+![img.png](img.png)
+
+日志复制模型:
+<div>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/654060005c9b3802e57c03ca">
+&lt;/iframe>
+</div>
+状态领域模型：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/65406b85bc6fc631ccd9f218"&gt;&lt;/iframe>
+
+整体线程设计：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/65408a803458d424197fed3c"&gt;&lt;/iframe>
+
+定时器组件领域模型：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541d8653458d42419813c8f"&gt;&lt;/iframe>
+
+消息建模：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541e7a714498b3bdf62b095"&gt;&lt;/iframe>
+
+一致性核心组件：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541f318bc4d97719889127e"&gt;&lt;/iframe>
+
+关联组件核心模型：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541e988ade4841ca5f7ac44"&gt;&lt;/iframe>
+
+日志文件领域模型：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6545e7b47aa468729679ff88"&gt;&lt;/iframe>
+
+日志的领域模型：
+
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6545d360b2286f77510462b4"&gt;&lt;/iframe>
+
 
