@@ -19,8 +19,8 @@ import java.util.List;
 @Data
 public abstract class AbstractEntrySequence implements EntrySequence {
     //Log index offset.
-    int logIndexOffset;
-    int nextLogIndex;
+    protected int logIndexOffset;
+    protected int nextLogIndex;
 
     public AbstractEntrySequence(int logIndexOffset) {
         this.logIndexOffset = logIndexOffset;
