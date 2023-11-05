@@ -1,6 +1,6 @@
 package com.hzh.domain.message;
 
-import com.hzh.domain.log.Entry;
+import com.hzh.domain.log.entry.Entry;
 import com.hzh.domain.node.NodeId;
 import lombok.Data;
 
