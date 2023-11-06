@@ -24,4 +24,8 @@ public class AppendEntriesRpc {
     private List<Entry> entries= Collections.emptyList();
     // the commit index for the leader
     private int leaderCommit;
+
+    public int getLastEntryIndex() {
+        return this.entries.isEmpty() ? this.preLogIndex : this.entries.get(this.entries.size() - 1).getIndex();
+    }
 }

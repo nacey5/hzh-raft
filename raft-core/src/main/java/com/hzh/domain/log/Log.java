@@ -24,7 +24,7 @@ public interface Log {
     EntryMeta getLastEntryMeta();
     AppendEntriesRpc createAppendEntriesRpc(int term, NodeId selfId,int nextIndex,int maxEntries);
     int getNextIndex();
-    boolean isNewerThen(int latLogIndex,int lastLogTerm);
+    boolean isNewerThan(int latLogIndex,int lastLogTerm);
     NoOpEntry appendEntry(int term);
     GeneralEntry appendEntry(int term,byte[] command);
     //append log from leader

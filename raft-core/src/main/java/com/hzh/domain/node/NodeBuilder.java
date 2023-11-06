@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.hzh.config.NodeConfig;
 import com.hzh.context.NodeContext;
+import com.hzh.domain.log.Log;
+import com.hzh.domain.log.MemoryLog;
 import com.hzh.domain.node.memory.MemoryNodeStore;
 import com.hzh.domain.timer.Scheduler;
 import com.hzh.domain.timer.sepecific.DefaultScheduler;
@@ -32,6 +34,8 @@ public class NodeBuilder {
     private TaskExecutor taskExecutor=null;
 
     private NodeStore store = null;
+
+    private Log log;
 
     /**
      * Node configuration.
@@ -85,6 +89,7 @@ public class NodeBuilder {
         context.setConnector(connector);
         context.setStore(store != null ? store : new MemoryNodeStore());
         context.setTaskExecutor(taskExecutor!=null?taskExecutor:new SingleThreadTaskExecutor("node"));
+        context.setLog(log!=null?log:new MemoryLog());
         return context;
     }
 }

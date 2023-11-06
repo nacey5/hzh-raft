@@ -32,4 +32,26 @@ public class GroupMember {
         return endpoint.getId().equals(id);
     }
 
+    public int getNextIndex() {
+        return ensureReplicatingState().getNextIndex();
+    }
+
+    private ReplicatingState ensureReplicatingState() {
+        if (replicatingState == null) {
+            throw new IllegalStateException("replication state not set");
+        }
+        return replicatingState;
+    }
+
+    public boolean advanceReplicatingState(int lastEntryIndex) {
+        return false;
+    }
+
+    int getMatchIndex() {
+        return ensureReplicatingState().getMatchIndex();
+    }
+
+    boolean backOffNextIndex() {
+        return ensureReplicatingState().backOffNextIndex();
+    }
 }

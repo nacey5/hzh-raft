@@ -26,7 +26,7 @@ public class ReplicatingState {
         this.matchIndex = matchIndex;
     }
 
-    boolean backOffNextIndex() {
+    public boolean backOffNextIndex() {
         if (nextIndex > 1) {
             nextIndex--;
             return true;

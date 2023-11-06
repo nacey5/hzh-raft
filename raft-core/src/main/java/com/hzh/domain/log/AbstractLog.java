@@ -69,7 +69,7 @@ public class AbstractLog implements Log {
     }
 
     @Override
-    public boolean isNewerThen(int lastLogIndex, int lastLogTerm) {
+    public boolean isNewerThan(int lastLogIndex, int lastLogTerm) {
         EntryMeta lastEntryMeta = getLastEntryMeta();
         logger.debug("last entry ({}, {}), candidate ({}, {})", lastEntryMeta.getIndex(), lastEntryMeta.getTerm());
         return lastEntryMeta.getTerm() > lastLogTerm || lastEntryMeta.getIndex() > lastLogIndex;

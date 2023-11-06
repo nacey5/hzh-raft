@@ -96,8 +96,12 @@ public abstract class AbstractEntrySequence implements EntrySequence {
             throw new EmptySequenceException();
         }
         //check Index
-        if (fromIndex < doGetFirstLogIndex() || toIndex > doGetLastLogIndex() + 1 || fromIndex > toIndex) {
+        // I think if the subsequent boundary exceeds the List, it can be considered that all child nodes are returned.
+        if (fromIndex < doGetFirstLogIndex() || fromIndex > toIndex) {
             throw new IllegalArgumentException("illegal from index" + fromIndex + " to index" + toIndex);
+        }
+        if (toIndex > doGetLastLogIndex() + 1) {
+            return doSubList(fromIndex, doGetLastLogIndex() + 1);
         }
         return doSubList(fromIndex, toIndex);
 

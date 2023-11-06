@@ -2,6 +2,7 @@ package com.hzh.context;
 
 import com.google.common.eventbus.EventBus;
 import com.hzh.config.NodeConfig;
+import com.hzh.domain.log.Log;
 import com.hzh.domain.node.*;
 import com.hzh.domain.timer.Scheduler;
 import com.hzh.exctutor.TaskExecutor;
@@ -22,7 +23,7 @@ public class NodeContext {
     // member List
     private NodeGroup group;
 
-    //private Log log;
+    private Log log;
 
     //RPC components
     private Connector connector;

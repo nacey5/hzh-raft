@@ -2,6 +2,8 @@ package com.hzh.domain.node;
 
 
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class NodeGroup {
     private final NodeId selfId;
     private Map<NodeId,GroupMember> memberMap;
+    private static final Logger logger= LoggerFactory.getLogger(NodeGroup.class);
 
     public Collection<NodeEndpoint> listEndpointExceptSelf() {
         Set<NodeEndpoint> endpoints=new HashSet<>();
@@ -62,5 +65,52 @@ public class NodeGroup {
 
     public Collection<GroupMember> listReplicationTargets() {
         return memberMap.values().stream().filter(m->!m.idEquals(selfId)).collect(Collectors.toList());
+    }
+
+    public int getMatchIndexOfMajor() {
+       List<NodeMatchIndex> matchIndices=new ArrayList<>();
+        for (GroupMember member : memberMap.values()) {
+            if (!member.idEquals(selfId)){
+                matchIndices.add(new NodeMatchIndex(member.getId(),member.getMatchIndex()));
+            }
+        }
+        int count=matchIndices.size();
+        // has not any node
+        if (count==0){
+            throw new IllegalStateException("standalone or no major node");
+        }
+        Collections.sort(matchIndices);
+        logger.debug("match indices {}",matchIndices);
+        //Get the matchIndex at the middle position after sorting
+        return matchIndices.get(count/2).getMatchIndex();
+    }
+
+
+    private static class NodeMatchIndex implements Comparable<NodeMatchIndex>{
+
+        private final NodeId nodeId;
+        private final int matchIndex;
+
+        private NodeMatchIndex(NodeId nodeId, int matchIndex) {
+            this.nodeId = nodeId;
+            this.matchIndex = matchIndex;
+        }
+
+        int getMatchIndex(){
+            return matchIndex;
+        }
+
+        @Override
+        public int compareTo(NodeMatchIndex o) {
+            return Integer.compare(matchIndex, o.matchIndex);
+        }
+
+        @Override
+        public String toString() {
+            return "NodeMatchIndex{" +
+                    "nodeId=" + nodeId +
+                    ", matchIndex=" + matchIndex +
+                    '}';
+        }
     }
 }

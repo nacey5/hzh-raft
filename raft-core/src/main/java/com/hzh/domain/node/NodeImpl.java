@@ -2,6 +2,7 @@ package com.hzh.domain.node;
 
 import com.google.common.eventbus.Subscribe;
 import com.hzh.context.NodeContext;
+import com.hzh.domain.log.entry.EntryMeta;
 import com.hzh.domain.log.task.LogReplicationTask;
 import com.hzh.domain.message.*;
 import com.hzh.domain.role.AbstractNodeRole;
@@ -80,6 +81,7 @@ public class NodeImpl implements Node {
     }
 
     private void doProcessElectionTimeout() {
+        EntryMeta lastEntryMeta =context.getLog().getLastEntryMeta();
         //There is no election start time under the Leader role.
         if (role.getName() == RoleName.LEADER) {
             logger.warn("node{},election timeout,but it is leader,ignore", context.getSelfId());
@@ -98,8 +100,8 @@ public class NodeImpl implements Node {
         RequestVoteRpc rpc = new RequestVoteRpc();
         rpc.setTerm(newTerm);
         rpc.setCandidateId(context.getSelfId());
-        rpc.setLastLogIndex(0);
-        rpc.setLastLogTerm(0);
+        rpc.setLastLogIndex(lastEntryMeta.getIndex());
+        rpc.setLastLogTerm(lastEntryMeta.getTerm());
         context.getConnector().sendRequestVote(rpc, context.getGroup().listEndpointExceptSelf());
     }
 
@@ -136,6 +138,7 @@ public class NodeImpl implements Node {
         boolean votedForCandidate = true;
         //If the object's term is larger than itself, switch to the Follower role
         if (rpc.getTerm() > role.getTerm()) {
+            boolean voteForCandidate = !context.getLog().isNewerThan(rpc.getLastLogIndex(), rpc.getLastLogTerm());
             becomeFollower(rpc.getTerm(), (votedForCandidate ? rpc.getCandidateId() : null), null, true);
             return new RequestVoteResult(rpc.getTerm(), votedForCandidate);
         }
@@ -224,7 +227,7 @@ public class NodeImpl implements Node {
         logger.debug("replicate log");
         //Send AppendEntries message to log replication target node
         for (GroupMember member : context.getGroup().listReplicationTargets()) {
-            doReplicateLogForDetail(member);
+            doReplicateLogForDetail(member,context.getConfig().getMaxReplicationEntries());
         }
     }
 
@@ -236,6 +239,11 @@ public class NodeImpl implements Node {
         rpc.setPreLogTerm(0);
         rpc.setLeaderCommit(0);
         context.getConnector().sendAppendEntries(rpc, member.getEndpoint());
+    }
+
+    private void doReplicateLogForDetail(GroupMember member, int maxEntries) {
+        context.getLog().createAppendEntriesRpc(role.getTerm(),context.getSelfId(),member
+                .getNextIndex(),maxEntries);
     }
 
 
@@ -284,7 +292,11 @@ public class NodeImpl implements Node {
     }
 
     private boolean appendEntries(AppendEntriesRpc rpc) {
-        return true;
+        boolean result = context.getLog().appendEntriesFromLeader(rpc.getPreLogIndex(), rpc.getPreLogTerm(), rpc.getEntries());
+        if (result){
+            context.getLog().advanceCommitIndex(Math.min(rpc.getLeaderCommit(),rpc.getLastEntryIndex()),rpc.getTerm());
+        }
+        return result;
     }
 
 
@@ -303,6 +315,28 @@ public class NodeImpl implements Node {
         //check own role
         if (role.getName() !=RoleName.LEADER){
             logger.warn (" receive append entries result from node {} but current node is not leader, ignore" , resultMessage.getSourceNodeId());
+        }
+
+        NodeId sourceNodeId = resultMessage.getSourceNodeId();
+        GroupMember member = context.getGroup().getMember(sourceNodeId);
+        //if not point anyone
+        if (member==null) {
+            logger.info("unexpected append entries result from node{},node maybe removed",sourceNodeId);
+            return;
+        }
+        AppendEntriesRpc rpc=resultMessage.getRpc();
+        if(result.isSuccess()){
+            //Reply successful
+            //advance the matchIndex and nextIndex
+            if (member.advanceReplicatingState(rpc.getLastEntryIndex())){
+                //advance the local commitIndex
+                context.getLog().advanceCommitIndex(context.getGroup().getMatchIndexOfMajor(),role.getTerm());
+            }else {
+                //Reply fail
+                if (!member.backOffNextIndex()){
+                    logger.warn("cannot back off next index more,node {}",sourceNodeId);
+                }
+            }
         }
 
     }
