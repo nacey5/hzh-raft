@@ -4,6 +4,7 @@ import com.hzh.domain.node.file.RandomAccessFileAdapter;
 import com.hzh.domain.node.file.SeekableFile;
 import lombok.Data;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -138,6 +139,26 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
     }
 
 
+    @Nonnull
+    public EntryIndexItem get(int entryIndex) {
+        checkEmpty();
+        if (entryIndex < minEntryIndex || entryIndex > maxEntryIndex) {
+            throw new IllegalArgumentException("index < min or index > max");
+        }
+        return entryIndexMap.get(entryIndex);
+    }
+
+    private void checkEmpty() {
+        if (isEmpty()) {
+            throw new IllegalStateException("no entry index");
+        }
+    }
+
+    public long getOffset(int entryIndex) {
+        return get(entryIndex).getOffset();
+    }
+
+
    private class EntryIndexIterator implements Iterator<EntryIndexItem> {
         private final int entryIndexCount;
 
@@ -173,6 +194,8 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
             return entryIndexMap.get(currentEntryIndex);
         }
     }
+
+
 
 
 }

@@ -5,6 +5,7 @@ import com.hzh.domain.node.file.RandomAccessFileAdapter;
 import com.hzh.domain.node.file.SeekableFile;
 import com.hzh.exception.EmptySequenceException;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class EntriesFile {
         truncate(0L);
     }
 
-    private void truncate(long offset) throws IOException {
+    public void truncate(long offset) throws IOException {
         seekableFile.truncate(offset);
     }
 
