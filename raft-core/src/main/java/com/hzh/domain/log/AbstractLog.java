@@ -57,7 +57,7 @@ public class AbstractLog implements Log {
         }
         //set the entries
         if (!entrySequence.isEmpty()) {
-            int maxIndex = (maxEntries == ALL_ENTRIES ? nextIndex : Math.min(nextLogIndex, nextIndex + maxEntries));
+            int maxIndex = (maxEntries == ALL_ENTRIES ? nextLogIndex : Math.min(nextLogIndex, nextIndex + maxEntries));
             rpc.setEntries(entrySequence.subList(nextIndex, maxIndex));
         }
         return rpc;
@@ -100,10 +100,44 @@ public class AbstractLog implements Log {
             return true;
         }
         //Remove conflicting log entries and return the next log entry to append (if any)
-        EntrySequenceView newEntries = new EntrySequenceView(leaderEntries);
+        EntrySequenceView newEntries = removeUnmatchedLog(new EntrySequenceView(leaderEntries));
         // append log only
         appendEntriesFromLeader(newEntries);
-        return false;
+        return true;
+    }
+
+    private EntrySequenceView removeUnmatchedLog(EntrySequenceView leaderEntries) {
+        assert !leaderEntries.isEmpty();
+        int firstUnmatched = findFirstUnmatchedLog(leaderEntries);
+        removeEntriesAfter(firstUnmatched - 1);
+        return leaderEntries.subView(firstUnmatched);
+    }
+
+
+    private int findFirstUnmatchedLog(EntrySequenceView leaderEntries) {
+        assert !leaderEntries.isEmpty();
+        int logIndex;
+        EntryMeta followerEntryMeta;
+        for (Entry leaderEntry : leaderEntries) {
+            logIndex = leaderEntry.getIndex();
+            followerEntryMeta = entrySequence.getEntryMeta(logIndex);
+            if (followerEntryMeta == null || followerEntryMeta.getTerm() != leaderEntry.getTerm()) {
+                return logIndex;
+            }
+        }
+        return leaderEntries.getLastLogIndex() + 1;
+    }
+
+    // todo It involves conflict status, that is, term of office, which will not be dealt with at this stage.
+    private void removeEntriesAfter(int index){
+        if (entrySequence.isEmpty() || index >= entrySequence.getLastLogIndex()) {
+            return;
+        }
+        logger.debug("remove entries after {}", index);
+        entrySequence.removeAfter(index);
+        if (index < commitIndex) {
+            commitIndex = index;
+        }
     }
 
     private void appendEntriesFromLeader(EntrySequenceView leaderEntries) {

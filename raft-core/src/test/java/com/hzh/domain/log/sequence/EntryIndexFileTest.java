@@ -1,5 +1,6 @@
 package com.hzh.domain.log.sequence;
 
+import com.hzh.domain.node.file.ByteArraySeekableFile;
 import com.hzh.domain.node.file.SeekableFile;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,6 +93,7 @@ public class EntryIndexFileTest {
 
     /**
      * max还没有设置
+     *
      * @throws IOException
      */
 //    @Test
@@ -115,14 +117,12 @@ public class EntryIndexFileTest {
 //
 //        assertFalse(iterator.hasNext());
 //    }
-
     @Test
     public void testIteratorWithEmptyFile() {
         Iterator<EntryIndexItem> iterator = entryIndexFileUnderTest.iterator();
 
         assertFalse(iterator.hasNext());
     }
-
 
 
     @Test
@@ -148,5 +148,112 @@ public class EntryIndexFileTest {
     @Test
     public void testIsEmpty() {
         assertTrue(entryIndexFileUnderTest.isEmpty());
+    }
+
+    private ByteArraySeekableFile makeEntryIndexFileContent(int minEntryIndex, int maxEntryIndex) throws IOException {
+        ByteArraySeekableFile seekableFile = new ByteArraySeekableFile();
+        seekableFile.writeInt(minEntryIndex);
+        seekableFile.writeInt(maxEntryIndex);
+        for (int i = minEntryIndex; i <= maxEntryIndex; i++) {
+            seekableFile.writeLong(10L * i); //offset
+            seekableFile.writeInt(1); //kind
+            seekableFile.writeInt(i); //term
+        }
+        seekableFile.seek(0L);
+        return seekableFile;
+    }
+
+    @Test
+    public void testLoad() throws IOException {
+        ByteArraySeekableFile seekableFile = makeEntryIndexFileContent(3, 4);
+        EntryIndexFile file = new EntryIndexFile(seekableFile);
+        assertEquals(3, file.getMinEntryIndex());
+        assertEquals(4, file.getMaxEntryIndex());
+        assertEquals(2, file.getEntryIndexCount());
+        EntryIndexItem item = file.get(3);
+        assertNotNull(item);
+        assertEquals(30L, item.getOffset());
+        assertEquals(1, item.getKind());
+        assertEquals(3, item.getTerm());
+        item = file.get(4);
+        assertNotNull(item);
+        assertEquals(40L, item.getOffset());
+        assertEquals(1, item.getKind());
+        assertEquals(4, item.getTerm());
+    }
+
+    @Test
+    public void testAppendEntryIndex2() throws IOException {
+        ByteArraySeekableFile seekableFile = new ByteArraySeekableFile();
+        EntryIndexFile file = new EntryIndexFile(seekableFile);
+        file.appendEntryIndex(10, 100l, 1, 2);
+        assertEquals(1, file.getEntryIndexCount());
+        assertEquals(10, file.getMinEntryIndex());
+        assertEquals(10, file.getMaxEntryIndex());
+        seekableFile.seek(0L);
+        assertEquals(10, seekableFile.readInt()); //min entry index
+        assertEquals(10, seekableFile.readInt()); // max entry index
+        assertEquals(100l, seekableFile.readLong()); //offset
+        assertEquals(1, seekableFile.readInt()); //kind
+        assertEquals(2, seekableFile.readInt()); //term
+        EntryIndexItem item = file.get(10);
+        assertNotNull(item);
+        assertEquals(100L, item.getOffset());
+        assertEquals(1, item.getKind());
+        assertEquals(2, item.getTerm());
+        file.appendEntryIndex(11, 200L, 1, 2);
+        assertEquals(2, file.getEntryIndexCount());
+        assertEquals(10, file.getMinEntryIndex());
+        assertEquals(11, file.getMaxEntryIndex());
+        seekableFile.seek(24L); //skip min/max and first entry index
+        assertEquals(200L, seekableFile.readLong()); //offset
+        assertEquals(1, seekableFile.readInt()); //kind
+        assertEquals(2, seekableFile.readInt()); //term
+    }
+
+    @Test
+    public void testClear2() throws IOException {
+        ByteArraySeekableFile seekableFile = makeEntryIndexFileContent(5, 6);
+        EntryIndexFile file = new EntryIndexFile(seekableFile);
+        assertFalse(file.isEmpty());
+        file.clear();
+        assertTrue(file.isEmpty());
+        assertEquals(0, file.getEntryIndexCount());
+        assertEquals(0L, seekableFile.size());
+    }
+
+    @Test
+    public void testRemoveAfter2() throws IOException {
+        ByteArraySeekableFile seekableFile = makeEntryIndexFileContent(5, 6);
+        EntryIndexFile file = new EntryIndexFile(seekableFile);
+        assertFalse(file.isEmpty());
+        file.clear();
+        assertTrue(file.isEmpty());
+        assertEquals(0, file.getEntryIndexCount());
+        assertEquals(0L, seekableFile.size());
+    }
+
+    @Test
+    public void testGet2() throws IOException {
+        EntryIndexFile file = new EntryIndexFile(makeEntryIndexFileContent(3, 4));
+        EntryIndexItem item = file.get(3);
+        assertNotNull(item);
+        assertEquals(1, item.getKind());
+        assertEquals(3, item.getTerm());
+    }
+
+    @Test
+    public void testIterator() throws IOException {
+        EntryIndexFile file = new EntryIndexFile(makeEntryIndexFileContent(3, 4));
+        Iterator<EntryIndexItem> iterator = file.iterator();
+        assertTrue(iterator.hasNext());
+        EntryIndexItem item = iterator.next();
+        assertEquals(3, item.getIndex());
+        assertEquals(1, item.getKind());
+        assertEquals(3, item.getTerm());
+        assertTrue(iterator.hasNext());
+        item = iterator.next();
+        assertEquals(4, item.getIndex());
+        assertFalse(iterator.hasNext());
     }
 }

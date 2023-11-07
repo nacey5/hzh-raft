@@ -19,7 +19,7 @@ import java.util.List;
  * includes the add log ,append,advance and check
  **/
 public interface Log {
-    int ALL_ENTRIES=1;
+    int ALL_ENTRIES=-1;
     // get the metadata for the lastIndex
     EntryMeta getLastEntryMeta();
     AppendEntriesRpc createAppendEntriesRpc(int term, NodeId selfId,int nextIndex,int maxEntries);

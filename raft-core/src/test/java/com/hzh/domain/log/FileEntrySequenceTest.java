@@ -1,169 +1,94 @@
 package com.hzh.domain.log;
 
 import com.hzh.domain.log.entry.Entry;
-import com.hzh.domain.log.entry.EntryMeta;
-import com.hzh.domain.log.entry.sepecific.GeneralEntry;
+import com.hzh.domain.log.entry.sepecific.NoOpEntry;
 import com.hzh.domain.log.sequence.EntriesFile;
-import com.hzh.domain.log.sequence.EntryFactory;
 import com.hzh.domain.log.sequence.EntryIndexFile;
-import com.hzh.domain.log.sequence.EntryIndexItem;
-import com.hzh.exception.LogException;
+import com.hzh.domain.node.file.ByteArraySeekableFile;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static com.hzh.domain.log.entry.Entry.KIND_GENERAL;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNull;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileEntrySequenceTest {
-
-    private FileEntrySequence fileEntrySequence;
-    private LogDir logDir;
-    private File tempDir;
-    private EntryFactory entryFactory = new EntryFactory();
+    private EntriesFile entriesFile;
+    private EntryIndexFile entryIndexFile;
 
     @Before
     public void setUp() throws Exception {
-        tempDir = new File(System.getProperty("java.io.tmpdir"), "test-log-dir");
-        tempDir.mkdirs();
-        logDir = new LogDir() {
-            @Override
-            public void initialize() {
-
-            }
-
-            @Override
-            public boolean exists() {
-                return false;
-            }
-
-            @Override
-            public File getEntriesFile() {
-                return null;
-            }
-
-            @Override
-            public File getEntryOffsetIndexFile() {
-                return null;
-            }
-
-            @Override
-            public File get() {
-                return null;
-            }
-
-            @Override
-            public boolean renameTo(LogDir logDir) {
-                return false;
-            }
-        };
-        fileEntrySequence = new FileEntrySequence(logDir, 1);
+        entriesFile = new EntriesFile(new ByteArraySeekableFile());
+        entryIndexFile = new EntryIndexFile(new ByteArraySeekableFile());
     }
 
     @Test
-    public void testDoAppend() {
-        GeneralEntry entry1 = new GeneralEntry(1, 1, new byte[0]);
-        GeneralEntry entry2 = new GeneralEntry(2, 2, new byte[0]);
-        Entry entry3 = entryFactory.create(KIND_GENERAL, 3, 3, new byte[0]);
-        fileEntrySequence.append(entry1);
-        fileEntrySequence.append(entry2);
-        fileEntrySequence.append(entry3);
-
-        List<Entry> entries = fileEntrySequence.subList(1);
-        assertEquals(3, entries.size());
-        assertEquals(entry1, entries.get(0));
-        assertEquals(entry2, entries.get(1));
+    public void testInitialize() throws IOException {
+        entryIndexFile.appendEntryIndex(1, 0L, 1, 1);
+        entryIndexFile.appendEntryIndex(2, 20L, 1, 1);
+        FileEntrySequence sequence = new FileEntrySequence(entriesFile, entryIndexFile, 1);
+        assertEquals(3, sequence.getNextLogIndex());
+        assertEquals(1, sequence.getFirstLogIndex());
+        assertEquals(2, sequence.getLastLogIndex());
+        assertEquals(2, sequence.getCommitIndex());
     }
 
     @Test
-    public void testDoRemoveAfter() {
-        GeneralEntry entry1 = new GeneralEntry(1, 1, new byte[0]);
-        GeneralEntry entry2 = new GeneralEntry(2, 2, new byte[0]);
-        GeneralEntry entry3 = new GeneralEntry(3, 3, new byte[0]);
+    public void testAppendEntry() {
+        FileEntrySequence sequence = new FileEntrySequence(entriesFile, entryIndexFile, 1);
+        assertEquals(1, sequence.getNextLogIndex());
+        sequence.append(new NoOpEntry(1, 1));
+        assertEquals(2, sequence.getNextLogIndex());
+        assertEquals(1, sequence.getLastEntry().getIndex());
+    }
 
-        fileEntrySequence.append(entry1);
-        fileEntrySequence.append(entry2);
-        fileEntrySequence.append(entry3);
-
-        fileEntrySequence.removeAfter(2);
-
-        List<Entry> entries = fileEntrySequence.subList(1);
-        assertEquals(2, entries.size());
-        assertEquals(entry1, entries.get(0));
-        assertEquals(entry2, entries.get(1));
+    private void appendEntryToFile(Entry entry) throws IOException{
+        long offset=entriesFile.appendEntry(entry);
+        entryIndexFile.appendEntryIndex(entry.getIndex(),offset,entry.getKind(),entry.getTerm());
     }
 
     @Test
-    public void testCommit() {
-        GeneralEntry entry1 = new GeneralEntry(1, 1, new byte[0]);
-        GeneralEntry entry2 = new GeneralEntry(2, 2, new byte[0]);
-        GeneralEntry entry3 = new GeneralEntry(3, 3, new byte[0]);
-
-        fileEntrySequence.append(entry1);
-        fileEntrySequence.append(entry2);
-        fileEntrySequence.append(entry3);
-
-        fileEntrySequence.commit(2);
-
-        assertEquals(2, fileEntrySequence.getCommitIndex());
+    public void testGetEntry() throws IOException{
+        appendEntryToFile(new NoOpEntry(1,1));
+        FileEntrySequence sequence = new FileEntrySequence(entriesFile, entryIndexFile, 1);
+        sequence.append(new NoOpEntry(2,1));
+        assertNull(sequence.getEntry(0));
+        assertEquals(1,sequence.getEntry(1).getIndex());
+        assertEquals(2,sequence.getEntry(2).getIndex());
+        assertNull(sequence.getEntry(3));
     }
 
     @Test
-    public void testGetEntryMeta() {
-        GeneralEntry entry1 = new GeneralEntry(1, 1, new byte[0]);
-        GeneralEntry entry2 = new GeneralEntry(2, 2, new byte[0]);
-        GeneralEntry entry3 = new GeneralEntry(3, 3, new byte[0]);
+    public void testSubList2() throws IOException{
+        appendEntryToFile(new NoOpEntry(1,1)); //1
+        appendEntryToFile(new NoOpEntry(2,2));// 2
+        FileEntrySequence sequence = new FileEntrySequence(entriesFile, entryIndexFile, 1);
+        sequence.append(new NoOpEntry(sequence.getNextLogIndex(),3)); //3
+        sequence.append(new NoOpEntry(sequence.getNextLogIndex(),4)); //4
 
-        fileEntrySequence.append(entry1);
-        fileEntrySequence.append(entry2);
-        fileEntrySequence.append(entry3);
-
-        EntryMeta meta = fileEntrySequence.getEntryMeta(2);
-
-        assertEquals(2, meta.getIndex());
-        assertEquals(2, meta.getTerm());
+        List<Entry> subList=sequence.subView(2);
+        assertEquals(3,subList.size());
+        assertEquals(2,subList.get(0).getIndex());
+        assertEquals(4,subList.get(2).getIndex());
     }
 
     @Test
-    public void testGetLastEntry() {
-        GeneralEntry entry1 = new GeneralEntry(1, 1, new byte[0]);
-        GeneralEntry entry2 = new GeneralEntry(2, 2, new byte[0]);
-        GeneralEntry entry3 = new GeneralEntry(3, 3, new byte[0]);
-
-        fileEntrySequence.append(entry1);
-        fileEntrySequence.append(entry2);
-        fileEntrySequence.append(entry3);
-
-        GeneralEntry lastEntry = (GeneralEntry)fileEntrySequence.getLastEntry();
-
-        assertEquals(entry3, lastEntry);
-    }
-
-    @Test
-    public void testGetLastEntryWithPendingEntries() {
-        GeneralEntry entry1 = new GeneralEntry(1, 1, new byte[0]);
-        GeneralEntry entry2 = new GeneralEntry(2, 2, new byte[0]);
-        GeneralEntry entry3 = new GeneralEntry(3, 3, new byte[0]);
-
-        fileEntrySequence.append(entry1);
-        fileEntrySequence.append(entry2);
-        fileEntrySequence.append(entry3);
-
-        fileEntrySequence.removeAfter(2);
-
-        GeneralEntry lastEntry =(GeneralEntry) fileEntrySequence.getLastEntry();
-
-        assertEquals(entry2, lastEntry);
+    public void testRemoveAfterEntriesInFile2() throws IOException{
+        appendEntryToFile(new NoOpEntry(1,1)); //1
+        appendEntryToFile(new NoOpEntry(2,1)); //2
+        FileEntrySequence sequence = new FileEntrySequence(entriesFile, entryIndexFile, 1);
+        sequence.append(new NoOpEntry(3,2)); //3
+        assertEquals(1,sequence.getFirstLogIndex());
+        assertEquals(3,sequence.getLastLogIndex());
+        sequence.removeAfter(1);
+        assertEquals(1,sequence.getFirstLogIndex());
+        assertEquals(1,sequence.getLastLogIndex());
     }
 }

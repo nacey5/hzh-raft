@@ -161,14 +161,7 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
 
    private class EntryIndexIterator implements Iterator<EntryIndexItem> {
         private final int entryIndexCount;
-
         private int currentEntryIndex;
-
-        private int minEntryIndex;
-        private int maxEntryIndex;
-
-        private Map<Integer, EntryIndexItem> entryIndexMap = new HashMap<>();
-
 
     public EntryIndexIterator(int entryIndexCount, int currentEntryIndex) {
             this.entryIndexCount = entryIndexCount;
@@ -191,7 +184,7 @@ public class EntryIndexFile implements Iterable<EntryIndexItem> {
         @Override
         public EntryIndexItem next() {
             checkModification();
-            return entryIndexMap.get(currentEntryIndex);
+            return entryIndexMap.get(currentEntryIndex++);
         }
     }
 

@@ -36,6 +36,8 @@ public interface EntrySequence {
 
     Entry getLastEntry();
 
+    List<Entry> subView(int fromIndex);
+
     void append(Entry entry);
 
     void append(List<Entry> entries);

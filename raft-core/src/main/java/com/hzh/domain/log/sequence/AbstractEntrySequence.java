@@ -91,6 +91,14 @@ public abstract class AbstractEntrySequence implements EntrySequence {
     }
 
     @Override
+    public List<Entry> subView(int fromIndex) {
+        if (isEmpty() || fromIndex > doGetLastLogIndex()) {
+            return Collections.emptyList();
+        }
+        return subList(Math.max(fromIndex, doGetFirstLogIndex()), nextLogIndex);
+    }
+
+    @Override
     public List<Entry> subList(int fromIndex, int toIndex) {
         if (isEmpty()) {
             throw new EmptySequenceException();

@@ -242,8 +242,9 @@ public class NodeImpl implements Node {
     }
 
     private void doReplicateLogForDetail(GroupMember member, int maxEntries) {
-        context.getLog().createAppendEntriesRpc(role.getTerm(),context.getSelfId(),member
-                .getNextIndex(),maxEntries);
+        AppendEntriesRpc rpc = context.getLog().createAppendEntriesRpc(role.getTerm(), context.getSelfId(), member
+                .getNextIndex(), maxEntries);
+        context.getConnector().sendAppendEntries(rpc, member.getEndpoint());
     }
 
 

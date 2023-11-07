@@ -30,7 +30,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
     private final LinkedList<Entry> pendingEntries = new LinkedList<>();
 
     //The initial commitIndex defined in the Raft algorithm has nothing to do with whether the log is persisted or not.
-    private int commitIndex = 0;
+    private int commitIndex;
 
     //construct function,aim to the directory
     public FileEntrySequence(LogDir logDir, int logIndexOffset) {
@@ -58,6 +58,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
         //Use minEntryIndex of the log index file as logIndexOffset
         logIndexOffset = entryIndexFile.getMinEntryIndex();
         nextLogIndex = entryIndexFile.getMaxEntryIndex() + 1;
+        commitIndex = entryIndexFile.getMaxEntryIndex();
     }
 
 
@@ -175,7 +176,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
         long offset;
         Entry entry = null;
         try {
-            for (int i = pendingEntries.getFirst().getIndex(); i < index; i++) {
+            for (int i = commitIndex + 1; i <= index; i++) {
                 entry = pendingEntries.removeFirst();
                 offset = entriesFile.appendEntry(entry);
                 entryIndexFile.appendEntryIndex(i, offset, entry.getKind(), entry.getTerm());

@@ -166,7 +166,7 @@ public class NodeImplTest {
         MockConnector connector = (MockConnector) node.getContext().getConnector();
         AppendEntriesResult result = (AppendEntriesResult) connector.getResult();
         Assert.assertEquals(1,result.getTerm());
-        Assert.assertTrue(result.isSuccess());
+        Assert.assertFalse(result.isSuccess());
         FollowerNodeRole role = (FollowerNodeRole) node.getRole();
         Assert.assertEquals(1,role.getTerm());
         Assert.assertEquals(NodeId.of("B"),role.getLeaderId());
