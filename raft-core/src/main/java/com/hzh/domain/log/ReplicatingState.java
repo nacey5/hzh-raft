@@ -17,7 +17,7 @@ public class ReplicatingState {
     private boolean replicating = false;
     private long lastReplicatedAt = 0;
 
-    ReplicatingState(int nextIndex) {
+    public ReplicatingState(int nextIndex) {
         this(nextIndex, 0);
     }
 

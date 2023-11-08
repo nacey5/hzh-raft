@@ -207,7 +207,7 @@ public class NodeImpl implements Node {
         role.cancelTimeoutOrTask();
         if (currentVotesCount > countOfMajor / 2) {
             logger.info("become leader,term{}", role.getTerm());
-            //resetReplicatingStates();
+            resetReplicatingStates();
             changeToRole(new LeaderNodeRole(role.getTerm(), scheduleLogReplicationTask()));
         } else {
             //Modify the number of votes received and recreate the election timeout timing
@@ -217,6 +217,10 @@ public class NodeImpl implements Node {
 
     private LogReplicationTask scheduleLogReplicationTask() {
         return context.getScheduler().scheduleLogReplicationTask(this::replicateLog);
+    }
+
+    private void resetReplicatingStates() {
+        context.getGroup().resetReplicatingStates(context.getLog().getNextIndex());
     }
 
     public void replicateLog() {
@@ -242,8 +246,7 @@ public class NodeImpl implements Node {
     }
 
     private void doReplicateLogForDetail(GroupMember member, int maxEntries) {
-        AppendEntriesRpc rpc = context.getLog().createAppendEntriesRpc(role.getTerm(), context.getSelfId(), member
-                .getNextIndex(), maxEntries);
+        AppendEntriesRpc rpc = context.getLog().createAppendEntriesRpc(role.getTerm(), context.getSelfId(), member.getNextIndex(), maxEntries);
         context.getConnector().sendAppendEntries(rpc, member.getEndpoint());
     }
 

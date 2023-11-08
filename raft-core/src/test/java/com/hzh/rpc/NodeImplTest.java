@@ -131,7 +131,7 @@ public class NodeImplTest {
         //send the RequestVote message
         node.electionTimeout();
         node.onReceiveRequestVoteResult(new RequestVoteResult(1,true));
-        node.replicateLog();
+        node.replicateLog(); //append entries * 2
         MockConnector connector = (MockConnector) node.getContext().getConnector();
         //all of them are 3 message
         Assert.assertEquals(3,connector.getMessageCount());

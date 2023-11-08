@@ -1,6 +1,7 @@
 package com.hzh.domain.node;
 
 
+import com.hzh.domain.log.ReplicatingState;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,14 @@ public class NodeGroup {
         logger.debug("match indices {}",matchIndices);
         //Get the matchIndex at the middle position after sorting
         return matchIndices.get(count/2).getMatchIndex();
+    }
+
+    void resetReplicatingStates(int nextLogIndex) {
+        for (GroupMember member : memberMap.values()) {
+            if (!member.idEquals(selfId)) {
+                member.setReplicatingState(new ReplicatingState(nextLogIndex));
+            }
+        }
     }
 
 
