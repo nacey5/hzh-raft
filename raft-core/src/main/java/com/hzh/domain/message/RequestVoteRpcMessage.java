@@ -1,6 +1,7 @@
 package com.hzh.domain.message;
 
 import com.hzh.domain.node.NodeId;
+import com.hzh.rpc.nio.Channel;
 
 /**
  * @ClassName RequestVoteRpcMessage
@@ -11,6 +12,9 @@ import com.hzh.domain.node.NodeId;
  **/
 public class RequestVoteRpcMessage extends AbstractRpcMessage<RequestVoteRpc>{
     public RequestVoteRpcMessage(RequestVoteRpc rpc, NodeId sourceNodeId) {
-        super(rpc, sourceNodeId);
+        super(rpc, sourceNodeId,null);
+    }
+    public RequestVoteRpcMessage(RequestVoteRpc rpc, NodeId sourceNodeId, Channel channel) {
+        super(rpc, sourceNodeId, channel);
     }
 }

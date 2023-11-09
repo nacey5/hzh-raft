@@ -24,7 +24,7 @@
         <lombok.version>1.18.30</lombok.version>
         <junit.version>4.13.2</junit.version>
         <commons-lang3.version>2.6</commons-lang3.version>
-        <protocol-buffer.version>3.6.0</protocol-buffer.version>
+        <protocol-buffer.version>3.24.4</protocol-buffer.version>
         <log4j.version>2.11.1</log4j.version>
         <commons-cli.version>1.4</commons-cli.version>
         <jline.version>3.9.0</jline.version>

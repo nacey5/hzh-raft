@@ -101,6 +101,11 @@ public class MockConnector implements Connector {
     }
 
     @Override
+    public void resetChannels() {
+
+    }
+
+    @Override
     public void close() {
 
     }

@@ -5,7 +5,7 @@
 顶层依赖
 
 | 类库名              | 描述               |
-| :--------------- | :--------------- |
+|:-----------------|:-----------------|
 | guava            | eventBus和方便的工具类  |
 | protobuf-java    | 与java绑定的protobuf |
 | netty-all        | netty处理器         |
@@ -218,7 +218,7 @@ guava
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -229,7 +229,7 @@ guava
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -315,6 +315,7 @@ junit
 
 </project>
 ```
+
 任期迁移模型：
 
 ![img.png](img.png)
@@ -326,34 +327,58 @@ junit
 </div>
 状态领域模型：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/65406b85bc6fc631ccd9f218"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/65406b85bc6fc631ccd9f218"&gt;&lt;/iframe>
 
 整体线程设计：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/65408a803458d424197fed3c"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/65408a803458d424197fed3c"&gt;&lt;/iframe>
 
 定时器组件领域模型：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541d8653458d42419813c8f"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541d8653458d42419813c8f"&gt;&lt;/iframe>
 
 消息建模：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541e7a714498b3bdf62b095"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541e7a714498b3bdf62b095"&gt;&lt;/iframe>
 
 一致性核心组件：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541f318bc4d97719889127e"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541f318bc4d97719889127e"&gt;&lt;/iframe>
 
 关联组件核心模型：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541e988ade4841ca5f7ac44"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6541e988ade4841ca5f7ac44"&gt;&lt;/iframe>
 
 日志文件领域模型：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6545e7b47aa468729679ff88"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6545e7b47aa468729679ff88"&gt;&lt;/iframe>
 
 日志的领域模型：
 
-&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6545d360b2286f77510462b4"&gt;&lt;/iframe>
+&lt;iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;margin-left:-244.5px; margin-top:
+-137.5px;width:489px; height:275px;" src="https://www.processon.com/embed/6545d360b2286f77510462b4"&gt;&lt;/iframe>
 
+注意点：
+我今天在编写测试代码的时候发现在使用proto文件生成类的时候发现会有报错，具体的原因是因为
+os上的protobuf的版本与maven依赖的版本对应不上，所以这一点需要注意：解决方式：
 
+~~~shell
+proto --version
+# 输出的如果是24.4，后面的4.4就是你的maven要对应的版本
+~~~
+
+~~~xml
+
+<dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <version>3.24.4</version>
+</dependency>
+~~~  

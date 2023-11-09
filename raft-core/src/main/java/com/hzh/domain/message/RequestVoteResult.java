@@ -14,6 +14,7 @@ import lombok.Data;
 public class RequestVoteResult {
     private final int term;
     // is voted or not
+    // if is true,Representatives have received votes
     private final boolean voteGranted;
 
     public RequestVoteResult(int term, boolean voteGranted) {

@@ -32,5 +32,7 @@ public interface Connector {
     //Return Append dEnt es results to a single node
     void replyAppendEntries(AppendEntriesResult rpc, NodeEndpoint destinationEndpoint);
 
+    void resetChannels();
+
     void close();
 }

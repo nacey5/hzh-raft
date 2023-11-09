@@ -1,6 +1,7 @@
 package com.hzh.domain.message;
 
 import com.hzh.domain.node.NodeId;
+import com.hzh.rpc.nio.Channel;
 
 /**
  * @ClassName AppendEntriesRpcMessage
@@ -11,6 +12,9 @@ import com.hzh.domain.node.NodeId;
  **/
 public class AppendEntriesRpcMessage extends AbstractRpcMessage<AppendEntriesRpc>{
     public AppendEntriesRpcMessage(AppendEntriesRpc rpc, NodeId sourceNodeId) {
-        super(rpc, sourceNodeId);
+        super(rpc, sourceNodeId,null);
+    }
+    public AppendEntriesRpcMessage(AppendEntriesRpc rpc, NodeId sourceNodeId, Channel channel) {
+        super(rpc, sourceNodeId, channel);
     }
 }
