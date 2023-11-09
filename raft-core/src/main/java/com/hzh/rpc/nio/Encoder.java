@@ -25,7 +25,7 @@ public class Encoder extends MessageToByteEncoder<Object> {
         //type judge
         if (msg instanceof NodeId) {
             this.writeMessage(out, MessageConstants.MSG_TYPE_NODE_ID, ((NodeId) msg).getValue().getBytes());
-        } else if (msg instanceof Protos.RequestVoteRpc) {
+        } else if (msg instanceof RequestVoteRpc) {
             RequestVoteRpc rpc = (RequestVoteRpc) msg;
             Protos.RequestVoteRpc protoRpc = Protos.RequestVoteRpc.newBuilder()
                     .setTerm(rpc.getTerm())
